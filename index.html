@@ -39,7 +39,6 @@
             background: rgba(255, 255, 255, 0.9);
             box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
         }
-        /* Fix for mobile view */
         @media (max-width: 768px) {
             body {
                 min-height: 100vh;
@@ -109,19 +108,6 @@
             border-radius: 6px;
             font-size: 1rem;
         }
-        .btn {
-            background-color: #4f46e5;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .btn:hover {
-            background-color: #4338ca;
-        }
     </style>
 </head>
 <body>
@@ -137,12 +123,11 @@
                 <label for="eventDate" class="form-label">Event Date & Time</label>
                 <input type="datetime-local" id="eventDate" class="form-input">
             </div>
-            <button id="setCountdown" class="btn">Set Countdown</button>
         </div>
         
         <div class="countdown-box mt-8">
             <h2 id="eventTitle" class="text-2xl md:text-3xl font-semibold mb-4">My Event</h2>
-            <p id="eventDateTime" class="bg-green-200 text-black-900 px-3 py-1 rounded-lg inline-block text-sm md:text-base mb-4"></p>
+            <p id="eventDateTime" class="bg-blue-100 text-black-900 px-3 py-1 rounded-lg inline-block text-sm md:text-base mb-4"></p>
             
             <div id="countdown" class="flex justify-center gap-4">
                 <div class="time-unit">
@@ -163,17 +148,14 @@
                 </div>
             </div>
             
-            <p id="countdownMessage" class="mt-4 text-lg font-medium hidden">Event has started!</p>
         </div>
     </div>
 
     <script>
-        // Load saved event data or set default
         function loadSavedEventData() {
             const savedEventDate = localStorage.getItem('eventDate');
             const savedEventName = localStorage.getItem('eventName');
             
-            // Load saved event name or use default
             if (savedEventName) {
                 document.getElementById('eventName').value = savedEventName;
             } else {
@@ -182,9 +164,7 @@
             
             if (savedEventDate) {
                 document.getElementById('eventDate').value = savedEventDate;
-                console.log("Loaded saved date:", savedEventDate); // Debug log
             } else {
-                // Set default date to tomorrow
                 const tomorrow = new Date();
                 tomorrow.setDate(tomorrow.getDate() + 1);
                 tomorrow.setHours(12, 0, 0, 0);
@@ -192,17 +172,13 @@
             }
         }
         
-        // Save event data to localStorage
         function saveEventData() {
             const eventDate = document.getElementById('eventDate').value;
             const eventName = document.getElementById('eventName').value;
             localStorage.setItem('eventDate', eventDate);
             localStorage.setItem('eventName', eventName);
-            console.log("Saved date to localStorage:", eventDate); // Debug log
-            console.log("Saved name to localStorage:", eventName); // Debug log
         }
-        
-        // Format date for display
+
         function formatDate(date) {
             const options = { 
                 weekday: 'long', 
@@ -214,8 +190,7 @@
             };
             return date.toLocaleDateString('en-US', options);
         }
-        
-        // Update event date display
+
         function updateEventDisplay() {
             const eventName = document.getElementById('eventName').value || 'My Event';
             const eventDate = new Date(document.getElementById('eventDate').value);
@@ -223,32 +198,20 @@
             document.getElementById('eventTitle').textContent = eventName;
             document.getElementById('eventDateTime').textContent = formatDate(eventDate);
         }
-        
-        // Initialize by loading saved data
+
         loadSavedEventData();
-        
-        // Initialize display
         updateEventDisplay();
-        
-        // Set countdown button
-        document.getElementById('setCountdown').addEventListener('click', function() {
-            saveEventData(); // Save only date
-            updateEventDisplay(); // Then update display
-        });
-        
-        // Also save data when user changes the date directly
+
         document.getElementById('eventDate').addEventListener('change', function() {
             saveEventData();
             updateEventDisplay();
         });
-        
-        // Update display and save when event name changes
+
         document.getElementById('eventName').addEventListener('change', function() {
             saveEventData();
             updateEventDisplay();
         });
-        
-        // Update countdown timer
+
         function updateCountdown() {
             const eventDate = new Date(document.getElementById('eventDate').value).getTime();
             const now = new Date().getTime();
@@ -268,13 +231,11 @@
                 document.getElementById('countdownMessage').classList.remove('hidden');
             }
         }
-        
-        // Update countdown every second
+
         setInterval(updateCountdown, 1000);
         updateCountdown();
     </script>
 
-    <!-- Social Media Icons -->
     <div class="social-icons">
         <a href="https://linkedin.com/in/shah-md-arshad-rahman-ziban-484649263" target="_blank" class="text-2xl text-blue-600 hover:text-blue-800"><i class="fab fa-linkedin"></i></a>
         <a href="https://github.com/arshadziban" target="_blank" class="text-2xl text-gray-800 hover:text-gray-900"><i class="fab fa-github"></i></a>
