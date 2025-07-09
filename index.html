@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Counter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        @font-face {
+            font-family: 'Bahnschrift';
+            src: local('Bahnschrift');
+        }
+        body {
+            background: url('assets/bg.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Bahnschrift', sans-serif;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            height: auto; 
+            color: #000;
+            padding: 20px;
+            overflow-y: auto; 
+            position: relative;
+        }
+        .social-icons {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
+        }
+        /* Fix for mobile view */
+        @media (max-width: 768px) {
+            body {
+                min-height: 100vh;
+                height: auto; 
+                padding-bottom: 100px; 
+            }
+            .social-icons {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                display: flex;
+                justify-content: center;
+                padding: 10px;
+            }
+        }
+        .content-wrapper {
+            margin-bottom: 80px;
+        }
+        .countdown-box {
+            background-color: rgba(255, 255, 255, 0.85);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .time-unit {
+            display: inline-block;
+            background-color: #f3f4f6;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 0 5px;
+            min-width: 80px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .time-value {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        .time-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: #6b7280;
+        }
+        .event-form {
+            margin-top: 30px;
+            background-color: rgba(255, 255, 255, 0.85);
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        .form-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        .btn {
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #4338ca;
+        }
+    </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <h1 class="text-4xl md:text-5xl font-bold">Time Counter</h1>
+        
+        <div class="event-form">
+            <div class="form-group">
+                <label for="eventName" class="form-label">Event Name</label>
+                <input type="text" id="eventName" class="form-input" placeholder="Enter event name" value="My Event">
+            </div>
+            <div class="form-group">
+                <label for="eventDate" class="form-label">Event Date & Time</label>
+                <input type="datetime-local" id="eventDate" class="form-input">
+            </div>
+            <button id="setCountdown" class="btn">Set Countdown</button>
+        </div>
+        
+        <div class="countdown-box mt-8">
+            <h2 id="eventTitle" class="text-2xl md:text-3xl font-semibold mb-4">My Event</h2>
+            <p id="eventDateTime" class="bg-green-200 text-black-900 px-3 py-1 rounded-lg inline-block text-sm md:text-base mb-4"></p>
+            
+            <div id="countdown" class="flex justify-center gap-4">
+                <div class="time-unit">
+                    <div id="days" class="time-value">00</div>
+                    <div class="time-label">Days</div>
+                </div>
+                <div class="time-unit">
+                    <div id="hours" class="time-value">00</div>
+                    <div class="time-label">Hours</div>
+                </div>
+                <div class="time-unit">
+                    <div id="minutes" class="time-value">00</div>
+                    <div class="time-label">Minutes</div>
+                </div>
+                <div class="time-unit">
+                    <div id="seconds" class="time-value">00</div>
+                    <div class="time-label">Seconds</div>
+                </div>
+            </div>
+            
+            <p id="countdownMessage" class="mt-4 text-lg font-medium hidden">Event has started!</p>
+        </div>
+    </div>
+
+    <script>
+        // Set default date to tomorrow
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(12, 0, 0, 0);
+        document.getElementById('eventDate').valueAsNumber = tomorrow.getTime() - (tomorrow.getTimezoneOffset() * 60000);
+        
+        // Format date for display
+        function formatDate(date) {
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            return date.toLocaleDateString('en-US', options);
+        }
+        
+        // Update event date display
+        function updateEventDisplay() {
+            const eventName = document.getElementById('eventName').value || 'My Event';
+            const eventDate = new Date(document.getElementById('eventDate').value);
+            
+            document.getElementById('eventTitle').textContent = eventName;
+            document.getElementById('eventDateTime').textContent = formatDate(eventDate);
+        }
+        
+        // Initialize display
+        updateEventDisplay();
+        
+        // Set countdown button
+        document.getElementById('setCountdown').addEventListener('click', function() {
+            updateEventDisplay();
+        });
+        
+        // Update countdown timer
+        function updateCountdown() {
+            const eventDate = new Date(document.getElementById('eventDate').value).getTime();
+            const now = new Date().getTime();
+            const timeLeft = eventDate - now;
+            
+            if (timeLeft > 0) {
+                document.getElementById('days').textContent = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                document.getElementById('hours').textContent = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                document.getElementById('minutes').textContent = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                document.getElementById('seconds').textContent = Math.floor((timeLeft % (1000 * 60)) / 1000);
+                document.getElementById('countdownMessage').classList.add('hidden');
+            } else {
+                document.getElementById('days').textContent = '00';
+                document.getElementById('hours').textContent = '00';
+                document.getElementById('minutes').textContent = '00';
+                document.getElementById('seconds').textContent = '00';
+                document.getElementById('countdownMessage').classList.remove('hidden');
+            }
+        }
+        
+        // Update countdown every second
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+    </script>
+
+    <!-- Social Media Icons -->
+    <div class="social-icons">
+        <a href="https://linkedin.com/in/shah-md-arshad-rahman-ziban-484649263" target="_blank" class="text-2xl text-blue-600 hover:text-blue-800"><i class="fab fa-linkedin"></i></a>
+        <a href="https://github.com/arshadziban" target="_blank" class="text-2xl text-gray-800 hover:text-gray-900"><i class="fab fa-github"></i></a>
+        <a href="https://www.facebook.com/share/1HanqZhnE8/" target="_blank" class="text-2xl text-blue-500 hover:text-blue-700"><i class="fab fa-facebook"></i></a>
+        <a href="https://www.behance.net/arshadziban" target="_blank" class="text-2xl text-black hover:text-gray-700"><i class="fab fa-behance"></i></a>
+    </div>
+</body>
+</html>
