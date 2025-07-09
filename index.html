@@ -168,11 +168,39 @@
     </div>
 
     <script>
-        // Set default date to tomorrow
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        tomorrow.setHours(12, 0, 0, 0);
-        document.getElementById('eventDate').valueAsNumber = tomorrow.getTime() - (tomorrow.getTimezoneOffset() * 60000);
+        // Load saved event data or set default
+        function loadSavedEventData() {
+            const savedEventDate = localStorage.getItem('eventDate');
+            const savedEventName = localStorage.getItem('eventName');
+            
+            // Load saved event name or use default
+            if (savedEventName) {
+                document.getElementById('eventName').value = savedEventName;
+            } else {
+                document.getElementById('eventName').value = 'My Event';
+            }
+            
+            if (savedEventDate) {
+                document.getElementById('eventDate').value = savedEventDate;
+                console.log("Loaded saved date:", savedEventDate); // Debug log
+            } else {
+                // Set default date to tomorrow
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                tomorrow.setHours(12, 0, 0, 0);
+                document.getElementById('eventDate').valueAsNumber = tomorrow.getTime() - (tomorrow.getTimezoneOffset() * 60000);
+            }
+        }
+        
+        // Save event data to localStorage
+        function saveEventData() {
+            const eventDate = document.getElementById('eventDate').value;
+            const eventName = document.getElementById('eventName').value;
+            localStorage.setItem('eventDate', eventDate);
+            localStorage.setItem('eventName', eventName);
+            console.log("Saved date to localStorage:", eventDate); // Debug log
+            console.log("Saved name to localStorage:", eventName); // Debug log
+        }
         
         // Format date for display
         function formatDate(date) {
@@ -196,11 +224,27 @@
             document.getElementById('eventDateTime').textContent = formatDate(eventDate);
         }
         
+        // Initialize by loading saved data
+        loadSavedEventData();
+        
         // Initialize display
         updateEventDisplay();
         
         // Set countdown button
         document.getElementById('setCountdown').addEventListener('click', function() {
+            saveEventData(); // Save only date
+            updateEventDisplay(); // Then update display
+        });
+        
+        // Also save data when user changes the date directly
+        document.getElementById('eventDate').addEventListener('change', function() {
+            saveEventData();
+            updateEventDisplay();
+        });
+        
+        // Update display and save when event name changes
+        document.getElementById('eventName').addEventListener('change', function() {
+            saveEventData();
             updateEventDisplay();
         });
         
